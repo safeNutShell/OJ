@@ -14,35 +14,45 @@
 
 using namespace std;
 
-const int Max_l = 10002;
-const int inf = 1 << 30;
-int dist[Max_l];//dist[i] 表示车站i 与i - 1的距离
-int d[Max_l];
-int dp[Max_l];
+//不能用99999999，真的有测试用例票价比这个高……
+//确认没有加减法运算时还是用INT_MAX吧
+//const int inf = 99999999;
+
 int main() {
-    int L1, L2, L3, C1, C2, C3, n, m, from, to, i, j, k;
-    while (cin >> L1 >> L2 >> L3 >> C1 >> C2 >> C3) {
-        cin >> n >> from >> to;
-        if (from > to) swap(from, to);
-        dist[1] = 0;
-        d[1] = 0;
-        for (i = 2; i <= n; i++) {
-            scanf("%d", &d[i]);
-            dist[i] = d[i] - d[i - 1];
-        }
-        for (i = 0; i <= n; i++)
-            dp[i] = inf;
-        dp[from] = 0;
-        for (i = from + 1; i <= to; i++) {
-            int s = dist[i];
-            for (j = i - 1; s <= L3 && j >= from; s += dist[j], j--) {//如果从j 到 i
-                if (0 < s && s <= L1) m = C1;
-                if (L1 < s && s <= L2) m = C2;
-                if (L2 < s && s <= L3) m = C3;
-                dp[i] = min(dp[i], dp[j] + m);
-            }
-        }
-        cout << dp[to] << endl;
-    }
-    return  0;
+	int l1, l2, l3, c1, c2, c3;
+	while (cin >> l1 >> l2 >> l3 >> c1 >> c2 >> c3) {
+		int n, start, end;
+		cin >> n >> start >> end;
+		if (start > end)
+			swap(start, end);
+		int dis[10010];
+		int dp[10010];
+		dis[0] = 0;
+		dis[1] = 0;
+		for (int i = 2; i < n + 1; i++)
+			cin >> dis[i];
+		for (int i = 0; i < n + 1; i++) {
+			if (i <= start)
+				dp[i] = 0;
+			else
+				dp[i] = INT_MAX;
+		}
+		for (int i = start + 1; i <= end; i++) {
+			for (int j = i - 1; j >= start; j--) {
+				int d = dis[i] - dis[j];
+				if (d > l3)
+					break;
+				int cost = 0;
+				if (d > 0 && d <= l1)
+					cost = c1;
+				else if (d > l1&& d <= l2)
+					cost = c2;
+				else if (d > l2&& d <= l3)
+					cost = c3;
+				dp[i] = min(dp[i], cost + dp[j]);
+			}
+		}
+		cout << dp[end] << endl;
+	}
+	return 0;
 }
